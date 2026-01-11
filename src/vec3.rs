@@ -1,6 +1,8 @@
 use std::ops;
 use std::ops::{AddAssign, SubAssign};
 
+pub type Point3 = Vec3;
+
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
