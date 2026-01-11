@@ -83,6 +83,18 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
+impl ops::Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Self::Output {
+        Vec3 {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
 impl Vec3 {
     pub fn length(self) -> f64 {
          self.length_squared().sqrt()
