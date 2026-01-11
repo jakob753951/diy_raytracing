@@ -7,7 +7,7 @@ pub struct Vec3 {
     pub z: f64,
 }
 
-impl ops::Add<Vec3> for Vec3 {
+impl ops::Add<Vec3> for &Vec3 {
     type Output = Vec3;
 
     fn add(self, _rhs: Vec3) -> Vec3 {
@@ -26,7 +26,7 @@ impl AddAssign<Vec3> for Vec3 {
     }
 }
 
-impl ops::Sub<Vec3> for Vec3 {
+impl ops::Sub<Vec3> for &Vec3 {
     type Output = Vec3;
 
     fn sub(self, _rhs: Vec3) -> Vec3 {
@@ -45,7 +45,7 @@ impl SubAssign<Vec3> for Vec3 {
     }
 }
 
-impl ops::Mul<f64> for Vec3 {
+impl ops::Mul<f64> for &Vec3 {
     type Output = Vec3;
 
     fn mul(self, _rhs: f64) -> Vec3 {
@@ -64,7 +64,26 @@ impl ops::MulAssign<f64> for Vec3 {
     }
 }
 
-impl ops::Div<f64> for Vec3 {
+impl ops::Mul<Vec3> for &Vec3 {
+    type Output = Vec3;
+
+    fn mul(self, _rhs: Vec3) -> Vec3 {
+        Vec3 {
+            x: self.x * _rhs.x,
+            y: self.y * _rhs.y,
+            z: self.z * _rhs.z,
+        }
+    }
+}
+impl ops::MulAssign<Vec3> for Vec3 {
+    fn mul_assign(&mut self, rhs: Vec3) {
+        self.x *= rhs.x;
+        self.y *= rhs.y;
+        self.z *= rhs.z;
+    }
+}
+
+impl ops::Div<f64> for &Vec3 {
     type Output = Vec3;
 
     fn div(self, _rhs: f64) -> Vec3 {
@@ -83,7 +102,7 @@ impl ops::DivAssign<f64> for Vec3 {
     }
 }
 
-impl ops::Neg for Vec3 {
+impl ops::Neg for &Vec3 {
     type Output = Vec3;
 
     fn neg(self) -> Self::Output {
@@ -96,11 +115,35 @@ impl ops::Neg for Vec3 {
 }
 
 impl Vec3 {
-    pub fn length(self) -> f64 {
+    pub const fn zero() -> Vec3 {
+        Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 0.,
+        }
+    }
+
+    pub fn length(&self) -> f64 {
          self.length_squared().sqrt()
     }
 
-    pub const fn length_squared(self) -> f64 { 
+    pub const fn length_squared(&self) -> f64 {
         self.x*self.x + self.y*self.y + self.z*self.z
+    }
+
+    pub const fn dot(&self, rhs: &Vec3) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+
+    pub const fn cross(&self, rhs: &Vec3) -> Vec3 {
+        Vec3 {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
+        }
+    }
+
+    pub fn normalize(&self) -> Vec3 {
+        self / self.length()
     }
 }
