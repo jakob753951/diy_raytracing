@@ -83,7 +83,7 @@ fn main() {
 }
 
 fn color_from_ray(ray: Ray) -> Color {
-    if hit_sphere(
+    let t = hit_sphere(
         Point3 {
             x: 0.,
             y: 0.,
@@ -91,8 +91,10 @@ fn color_from_ray(ray: Ray) -> Color {
         },
         0.5,
         ray,
-    ) {
-        return Color::red();
+    );
+    if t > 0. {
+        let n = (ray.at(t) - Vec3 { x: 0., y: 0., z: -1. }).normalize();
+        return 0.5 * Color { x: n.x+1., y: n.y+1., z: n.z+1. };
     }
 
     let unit_direction = ray.direction.normalize();
@@ -122,11 +124,16 @@ fn lerp(factor: f64, start: Vec3, end: Vec3) -> Vec3 {
     (1.0 - factor) * end + factor * start
 }
 
-fn hit_sphere(center: Point3, radius: f64, ray: Ray) -> bool {
+fn hit_sphere(center: Point3, radius: f64, ray: Ray) -> f64 {
     let oc = center - ray.origin;
     let a = Vec3::dot(&ray.direction, &ray.direction);
     let b = -2.0 * Vec3::dot(&ray.direction, &oc);
     let c = Vec3::dot(&oc, &oc) - radius * radius;
     let discriminant = b * b - 4. * a * c;
-    discriminant >= 0.
+
+    if discriminant < 0. {
+        -1.0
+    } else {
+        (-b - discriminant.sqrt()) / (2.0*a)
+    }
 }
