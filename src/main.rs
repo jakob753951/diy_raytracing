@@ -1,7 +1,11 @@
+use crate::hittable::Hittable;
 use crate::ray::Ray;
+use crate::sphere::Sphere;
 use crate::vec3::{Point3, Vec3};
 mod ray;
 mod vec3;
+mod hittable;
+mod sphere;
 
 type Color = Vec3;
 
@@ -41,7 +45,7 @@ impl Color {
 
 fn main() {
     let aspect_ratio = 16. / 9.;
-    let image_width = 400;
+    let image_width = 1000;
 
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let image_height = image_height.max(1);
@@ -83,18 +87,17 @@ fn main() {
 }
 
 fn color_from_ray(ray: Ray) -> Color {
-    let t = hit_sphere(
-        Point3 {
-            x: 0.,
-            y: 0.,
-            z: -1.,
+    let sphere = Sphere {
+        center: Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: -1.0,
         },
-        0.5,
-        ray,
-    );
-    if t > 0. {
-        let n = (ray.at(t) - Vec3 { x: 0., y: 0., z: -1. }).normalize();
-        return 0.5 * Color { x: n.x+1., y: n.y+1., z: n.z+1. };
+        radius: 0.5,
+    };
+    let hit = sphere.hit(&ray, 0., f64::INFINITY);
+    if hit.is_some() {
+        return 0.5 * (hit.unwrap().normal + Color::white())
     }
 
     let unit_direction = ray.direction.normalize();
@@ -122,18 +125,4 @@ fn write_color(color: Color) {
 
 fn lerp(factor: f64, start: Vec3, end: Vec3) -> Vec3 {
     (1.0 - factor) * end + factor * start
-}
-
-fn hit_sphere(center: Point3, radius: f64, ray: Ray) -> f64 {
-    let oc = center - ray.origin;
-    let a = ray.direction.length_squared();
-    let h = Vec3::dot(&ray.direction, &oc);
-    let c = oc.length_squared() - radius * radius;
-    let discriminant = h * h - a * c;
-
-    if discriminant < 0. {
-        -1.0
-    } else {
-        (h - discriminant.sqrt()) / a
-    }
 }
