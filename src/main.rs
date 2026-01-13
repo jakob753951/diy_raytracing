@@ -52,7 +52,7 @@ fn main() {
     let camera_center = Point3::zero();
 
     let viewport_u = Vec3::new(viewport_width, 0., 0.);
-    let viewport_v = Vec3::new(0., viewport_height, 0.);
+    let viewport_v = Vec3::new(0., -viewport_height, 0.);
 
     let pixel_delta_u = viewport_u / image_width as f64;
     let pixel_delta_v = viewport_v / image_height as f64;
