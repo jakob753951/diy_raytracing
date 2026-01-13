@@ -3,23 +3,31 @@ use std::ops::{AddAssign, SubAssign};
 
 pub type Point3 = Vec3;
 
+#[derive(Copy, Clone)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
 }
 
-impl ops::Add<Vec3> for &Vec3 {
-    type Output = Vec3;
-
-    fn add(self, _rhs: Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x + _rhs.x,
-            y: self.y + _rhs.y,
-            z: self.z + _rhs.z,
+macro_rules! vec3_vec3_add {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Add<$rhs> for $lhs {
+            type Output = Vec3;
+            fn add(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x + rhs.x,
+                    y: self.y + rhs.y,
+                    z: self.z + rhs.z,
+                }
+            }
         }
-    }
+    };
 }
+vec3_vec3_add!(Vec3, Vec3);
+vec3_vec3_add!(Vec3, &Vec3);
+vec3_vec3_add!(&Vec3, Vec3);
+vec3_vec3_add!(&Vec3, &Vec3);
 impl AddAssign<Vec3> for Vec3 {
     fn add_assign(&mut self, rhs: Vec3) {
         self.x += rhs.x;
@@ -28,17 +36,24 @@ impl AddAssign<Vec3> for Vec3 {
     }
 }
 
-impl ops::Sub<Vec3> for &Vec3 {
-    type Output = Vec3;
-
-    fn sub(self, _rhs: Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x - _rhs.x,
-            y: self.y - _rhs.y,
-            z: self.z - _rhs.z,
+macro_rules! vec3_vec3_sub {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Sub<$rhs> for $lhs {
+            type Output = Vec3;
+            fn sub(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x - rhs.x,
+                    y: self.y - rhs.y,
+                    z: self.z - rhs.z,
+                }
+            }
         }
-    }
+    };
 }
+vec3_vec3_sub!(Vec3, Vec3);
+vec3_vec3_sub!(Vec3, &Vec3);
+vec3_vec3_sub!(&Vec3, Vec3);
+vec3_vec3_sub!(&Vec3, &Vec3);
 impl SubAssign<Vec3> for Vec3 {
     fn sub_assign(&mut self, rhs: Vec3) {
         self.x -= rhs.x;
@@ -47,34 +62,57 @@ impl SubAssign<Vec3> for Vec3 {
     }
 }
 
-impl ops::Mul<f64> for &Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, _rhs: f64) -> Vec3 {
-        Vec3 {
-            x: self.x * _rhs,
-            y: self.y * _rhs,
-            z: self.z * _rhs,
+macro_rules! vec3_f64_mul {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Mul<$rhs> for $lhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x * rhs,
+                    y: self.y * rhs,
+                    z: self.z * rhs,
+                }
+            }
         }
-    }
+        impl std::ops::Mul<$lhs> for $rhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $lhs) -> Vec3 {
+                Vec3 {
+                    x: self * rhs.x,
+                    y: self * rhs.y,
+                    z: self * rhs.z,
+                }
+            }
+        }
+    };
 }
+vec3_f64_mul!(Vec3, f64);
+vec3_f64_mul!(&Vec3, f64);
+vec3_f64_mul!(Vec3, &f64);
+vec3_f64_mul!(&Vec3, &f64);
+macro_rules! vec3_vec3_mul {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Mul<$rhs> for $lhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x * rhs.x,
+                    y: self.y * rhs.y,
+                    z: self.z * rhs.z,
+                }
+            }
+        }
+    };
+}
+vec3_vec3_mul!(Vec3, Vec3);
+vec3_vec3_mul!(&Vec3, Vec3);
+vec3_vec3_mul!(Vec3, &Vec3);
+vec3_vec3_mul!(&Vec3, &Vec3);
 impl ops::MulAssign<f64> for Vec3 {
     fn mul_assign(&mut self, rhs: f64) {
         self.x *= rhs;
         self.y *= rhs;
         self.z *= rhs;
-    }
-}
-
-impl ops::Mul<Vec3> for &Vec3 {
-    type Output = Vec3;
-
-    fn mul(self, _rhs: Vec3) -> Vec3 {
-        Vec3 {
-            x: self.x * _rhs.x,
-            y: self.y * _rhs.y,
-            z: self.z * _rhs.z,
-        }
     }
 }
 impl ops::MulAssign<Vec3> for Vec3 {
@@ -85,17 +123,42 @@ impl ops::MulAssign<Vec3> for Vec3 {
     }
 }
 
-impl ops::Div<f64> for &Vec3 {
-    type Output = Vec3;
-
-    fn div(self, _rhs: f64) -> Vec3 {
-        Vec3 {
-            x: self.x / _rhs,
-            y: self.y / _rhs,
-            z: self.z / _rhs,
+macro_rules! vec3_f64_div {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Div<$rhs> for $lhs {
+            type Output = Vec3;
+            fn div(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x / rhs,
+                    y: self.y / rhs,
+                    z: self.z / rhs,
+                }
+            }
         }
-    }
+    };
 }
+vec3_f64_div!(Vec3, f64);
+vec3_f64_div!(Vec3, &f64);
+vec3_f64_div!(&Vec3, f64);
+vec3_f64_div!(&Vec3, &f64);
+macro_rules! vec3_vec3_div {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Div<$rhs> for $lhs {
+            type Output = Vec3;
+            fn div(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x / rhs.x,
+                    y: self.y / rhs.y,
+                    z: self.z / rhs.z,
+                }
+            }
+        }
+    };
+}
+vec3_vec3_div!(Vec3, Vec3);
+vec3_vec3_div!(Vec3, &Vec3);
+vec3_vec3_div!(&Vec3, Vec3);
+vec3_vec3_div!(&Vec3, &Vec3);
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, rhs: f64) {
         self.x /= rhs;
@@ -117,6 +180,10 @@ impl ops::Neg for &Vec3 {
 }
 
 impl Vec3 {
+    pub const fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 { x, y, z }
+    }
+
     pub const fn zero() -> Vec3 {
         Vec3 {
             x: 0.,
@@ -126,11 +193,11 @@ impl Vec3 {
     }
 
     pub fn length(&self) -> f64 {
-         self.length_squared().sqrt()
+        self.length_squared().sqrt()
     }
 
     pub const fn length_squared(&self) -> f64 {
-        self.x*self.x + self.y*self.y + self.z*self.z
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub const fn dot(&self, rhs: &Vec3) -> f64 {
