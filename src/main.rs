@@ -8,6 +8,7 @@ mod vec3;
 mod hittable;
 mod sphere;
 mod hittable_collection;
+mod interval;
 
 type Color = Vec3;
 
