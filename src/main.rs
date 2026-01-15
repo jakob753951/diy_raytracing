@@ -1,4 +1,5 @@
 use crate::hittable::Hittable;
+use crate::hittable_collection::HittableCollection;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::{Point3, Vec3};
@@ -6,6 +7,7 @@ mod ray;
 mod vec3;
 mod hittable;
 mod sphere;
+mod hittable_collection;
 
 type Color = Vec3;
 
@@ -50,6 +52,20 @@ fn main() {
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let image_height = image_height.max(1);
 
+
+    // world
+    let mut world = HittableCollection::new();
+    world.add(Box::new(Sphere {
+        center: Vec3 { x: 0.0, y: 0.0, z: -1.0, },
+        radius: 0.5,
+    }));
+    world.add(Box::new(Sphere {
+        center: Vec3 { x: 0.0, y: -100.5, z: -1.0, },
+        radius: 100.,
+    }));
+
+
+    // camera
     let focal_length = 1.0;
     let viewport_height = 2.0;
     let viewport_width = viewport_height * ((image_width as f64) / image_height as f64);
@@ -80,37 +96,35 @@ fn main() {
                 direction: ray_direction,
             };
 
-            let pixel_color = color_from_ray(ray);
+            let pixel_color = color_from_ray(ray, &world);
             write_color(pixel_color);
         }
     }
 }
 
-fn color_from_ray(ray: Ray) -> Color {
-    let sphere = Sphere {
-        center: Vec3 {
-            x: 0.0,
-            y: 0.0,
-            z: -1.0,
-        },
-        radius: 0.5,
-    };
-    let hit = sphere.hit(&ray, 0., f64::INFINITY);
-    if hit.is_some() {
-        return 0.5 * (hit.unwrap().normal + Color::white())
+fn color_from_ray(ray: Ray, world: &HittableCollection) -> Color {
+    let hit = world.hit(&ray, 0., f64::INFINITY);
+    match hit {
+        Some(hit) => {
+            let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
+
+            0.5 * (hit.normal + Color::white())
+        }
+        None => {
+            let unit_direction = ray.direction.normalize();
+            let a = 0.5 * (unit_direction.y + 1.0);
+            lerp(
+                a,
+                Color {
+                    x: 0.5,
+                    y: 0.7,
+                    z: 1.0,
+                },
+                Color::white(),
+            )
+        }
     }
 
-    let unit_direction = ray.direction.normalize();
-    let a = 0.5 * (unit_direction.y + 1.0);
-    lerp(
-        a,
-        Color {
-            x: 0.5,
-            y: 0.7,
-            z: 1.0,
-        },
-        Color::white(),
-    )
 }
 
 fn write_color(color: Color) {

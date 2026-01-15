@@ -31,7 +31,7 @@ impl Hittable for Sphere {
         let t = root;
         let p = ray.at(t);
         let normal = (p - self.center) / self.radius;
-        return Some(Hit { p, normal, t, });
+        Some(Hit { p, normal, t, })
     }
 }
 
