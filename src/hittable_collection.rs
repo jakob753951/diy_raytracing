@@ -20,6 +20,14 @@ impl HittableCollection {
     }
 }
 
+impl From<Vec<Box<dyn Hittable>>> for HittableCollection {
+    fn from(value: Vec<Box<dyn Hittable>>) -> Self {
+        HittableCollection {
+            objects: value
+        }
+    }
+}
+
 impl Hittable for HittableCollection {
     fn hit(&self, ray: &Ray, t_interval: Interval) -> Option<Hit> {
         let mut closest_hit: Option<Hit> = None;
