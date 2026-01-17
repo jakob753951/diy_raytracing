@@ -1,14 +1,15 @@
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
+use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::sphere::Sphere;
 use crate::vec3::{Point3, Vec3};
-mod ray;
-mod vec3;
 mod hittable;
-mod sphere;
 mod hittable_collection;
 mod interval;
+mod ray;
+mod sphere;
+mod vec3;
 
 type Color = Vec3;
 
@@ -53,18 +54,24 @@ fn main() {
     let image_height = ((image_width as f64) / aspect_ratio) as i32;
     let image_height = image_height.max(1);
 
-
     // world
     let mut world = HittableCollection::new();
     world.add(Box::new(Sphere {
-        center: Vec3 { x: 0.0, y: 0.0, z: -1.0, },
+        center: Vec3 {
+            x: 0.0,
+            y: 0.0,
+            z: -1.0,
+        },
         radius: 0.5,
     }));
     world.add(Box::new(Sphere {
-        center: Vec3 { x: 0.0, y: -100.5, z: -1.0, },
+        center: Vec3 {
+            x: 0.0,
+            y: -100.5,
+            z: -1.0,
+        },
         radius: 100.,
     }));
-
 
     // camera
     let focal_length = 1.0;
@@ -104,7 +111,13 @@ fn main() {
 }
 
 fn color_from_ray(ray: Ray, world: &HittableCollection) -> Color {
-    let hit = world.hit(&ray, 0., f64::INFINITY);
+    let hit = world.hit(
+        &ray,
+        Interval {
+            min: 0.,
+            max: f64::INFINITY,
+        },
+    );
     match hit {
         Some(hit) => {
             let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
@@ -125,7 +138,6 @@ fn color_from_ray(ray: Ray, world: &HittableCollection) -> Color {
             )
         }
     }
-
 }
 
 fn write_color(color: Color) {
