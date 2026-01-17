@@ -1,4 +1,4 @@
-use crate::color::{Color};
+use crate::color::{write_color, Color};
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
 use crate::interval::Interval;
@@ -105,16 +105,6 @@ impl Camera {
             }
         }
     }
-}
-
-fn write_color(color: Color) {
-    let Color { x: r, y: g, z: b } = color;
-
-    let r = (r * 255.999) as u8;
-    let g = (g * 255.999) as u8;
-    let b = (b * 255.999) as u8;
-
-    println!("{r} {g} {b}")
 }
 
 fn lerp(factor: f64, start: Vec3, end: Vec3) -> Vec3 {

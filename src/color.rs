@@ -35,3 +35,13 @@ impl Color {
         Vec3::zero()
     }
 }
+
+pub fn write_color(color: Color) {
+    let color = color.clamp(0., 0.999);
+
+    let color = color * 256.;
+
+    let Color { x: r, y: g, z: b } = color;
+    let (r, g, b) = (r as u8, g as u8, b as u8);
+    println!("{r} {g} {b}")
+}
