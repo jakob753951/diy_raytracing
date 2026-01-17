@@ -1,10 +1,8 @@
 use crate::camera::Camera;
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
-use crate::interval::Interval;
-use crate::ray::Ray;
 use crate::sphere::Sphere;
-use crate::vec3::{Point3, Vec3};
+use crate::vec3::Vec3;
 mod hittable;
 mod hittable_collection;
 mod interval;
