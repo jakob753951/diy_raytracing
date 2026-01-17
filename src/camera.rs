@@ -17,24 +17,29 @@ pub struct Camera {
 
 impl Camera {
     pub fn new(image_width: u16, aspect_ratio: f64) -> Camera {
+        // image dimensions
         let image_height = ((image_width as f64) / aspect_ratio) as i32;
         let image_height = image_height.max(1) as u16;
 
-        // camera
+        let camera_center = Point3::zero();
+
+        // viewport dimensions
         let focal_length = 1.0;
         let viewport_height = 2.0;
         let viewport_width = viewport_height * ((image_width as f64) / image_height as f64);
-        let camera_center = Point3::zero();
-
         let viewport_u = Vec3::new(viewport_width, 0., 0.);
         let viewport_v = Vec3::new(0., -viewport_height, 0.);
 
+        // delta vectors between pixels on x and y
         let pixel_delta_u = viewport_u / image_width as f64;
         let pixel_delta_v = viewport_v / image_height as f64;
 
+        // position of the top-left corner of the viewport
         let viewport_top_left_pos =
             camera_center - Vec3::new(0., 0., focal_length) - viewport_u / 2. - viewport_v / 2.;
 
+        // position of the top-left pixel in the viewport
+        // not the same as the corner, due to offset (pixel point should be in the middle of the area it shows)
         let first_pixel_loc = viewport_top_left_pos + (pixel_delta_u + pixel_delta_v) * 0.5;
 
         Camera {
@@ -47,7 +52,7 @@ impl Camera {
             pixel_delta_v,
         }
     }
-    
+
     pub fn render(&self, world: &HittableCollection) {
         let image_width = self.image_width;
         let image_height = self.image_height;
