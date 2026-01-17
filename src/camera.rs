@@ -13,10 +13,11 @@ pub struct Camera {
     first_pixel_loc: Point3, // Location of pixel 0, 0
     pixel_delta_u: Vec3, // Offset to pixel to the right
     pixel_delta_v: Vec3, // Offset to pixel below
+    samples_per_pixel: u8,
 }
 
 impl Camera {
-    pub fn new(image_width: u16, aspect_ratio: f64) -> Camera {
+    pub fn new(image_width: u16, aspect_ratio: f64, samples_per_pixel: u8) -> Camera {
         // image dimensions
         let image_height = ((image_width as f64) / aspect_ratio) as i32;
         let image_height = image_height.max(1) as u16;
@@ -50,6 +51,7 @@ impl Camera {
             first_pixel_loc,
             pixel_delta_u,
             pixel_delta_v,
+            samples_per_pixel,
         }
     }
 
