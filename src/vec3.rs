@@ -215,4 +215,12 @@ impl Vec3 {
     pub fn normalize(&self) -> Vec3 {
         self / self.length()
     }
+
+    pub fn clamp(&self, min: f64, max: f64) -> Vec3 {
+        Vec3 {
+            x: self.x.clamp(min, max),
+            y: self.y.clamp(min, max),
+            z: self.z.clamp(min, max),
+        }
+    }
 }

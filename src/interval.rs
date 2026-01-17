@@ -31,3 +31,7 @@ impl Interval {
         self.min < x && x < self.max
     }
 }
+
+pub fn clamp(num: f64, interval: Interval) -> f64 {
+    num.clamp(interval.min, interval.max)
+}
