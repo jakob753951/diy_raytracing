@@ -21,8 +21,8 @@ pub struct Camera {
 impl Camera {
     pub fn new(image_width: u16, aspect_ratio: f64, samples_per_pixel: u8) -> Camera {
         // image dimensions
-        let image_height = ((image_width as f64) / aspect_ratio) as i32;
-        let image_height = image_height.max(1) as u16;
+        let image_height = ((image_width as f64) / aspect_ratio) as u16;
+        let image_height = image_height.max(1);
 
         let camera_center = Point3::zero();
 
