@@ -4,7 +4,6 @@ use crate::hittable_collection::HittableCollection;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
-use rand;
 
 pub struct Camera {
     aspect_ratio: f64,
@@ -137,13 +136,4 @@ impl Camera {
 
 fn lerp(factor: f64, start: Vec3, end: Vec3) -> Vec3 {
     (1.0 - factor) * end + factor * start
-}
-
-/// Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
-fn sample_square() -> Vec3 {
-    Vec3 {
-        x: rand::random_range(-0.5..=0.5),
-        y: rand::random_range(-0.5..=0.5),
-        z: 0.,
-    }
 }
