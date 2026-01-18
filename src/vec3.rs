@@ -1,3 +1,5 @@
+use rand::Rng;
+use rand::distr::{Distribution, StandardUniform};
 use std::iter::Sum;
 use std::ops;
 use std::ops::{AddAssign, SubAssign};
@@ -9,6 +11,52 @@ pub struct Vec3 {
     pub x: f64,
     pub y: f64,
     pub z: f64,
+}
+
+impl Vec3 {
+    pub const fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 { x, y, z }
+    }
+
+    pub const fn zero() -> Vec3 {
+        Vec3 {
+            x: 0.,
+            y: 0.,
+            z: 0.,
+        }
+    }
+
+    pub fn length(&self) -> f64 {
+        self.length_squared().sqrt()
+    }
+
+    pub const fn length_squared(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
+    }
+
+    pub const fn dot(&self, rhs: &Vec3) -> f64 {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+
+    pub const fn cross(&self, rhs: &Vec3) -> Vec3 {
+        Vec3 {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
+        }
+    }
+
+    pub fn normalize(&self) -> Vec3 {
+        self / self.length()
+    }
+
+    pub fn clamp(&self, min: f64, max: f64) -> Vec3 {
+        Vec3 {
+            x: self.x.clamp(min, max),
+            y: self.y.clamp(min, max),
+            z: self.z.clamp(min, max),
+        }
+    }
 }
 
 macro_rules! vec3_vec3_add {
@@ -37,8 +85,8 @@ impl AddAssign<Vec3> for Vec3 {
     }
 }
 impl Sum for Vec3 {
-    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
-        iter.fold(Vec3::zero(), |a, b| {a + b})
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.fold(Vec3::zero(), |a, b| a + b)
     }
 }
 
@@ -237,48 +285,16 @@ impl ops::Neg for &Vec3 {
     }
 }
 
-impl Vec3 {
-    pub const fn new(x: f64, y: f64, z: f64) -> Vec3 {
-        Vec3 { x, y, z }
-    }
-
-    pub const fn zero() -> Vec3 {
-        Vec3 {
-            x: 0.,
-            y: 0.,
-            z: 0.,
-        }
-    }
-
-    pub fn length(&self) -> f64 {
-        self.length_squared().sqrt()
-    }
-
-    pub const fn length_squared(&self) -> f64 {
-        self.x * self.x + self.y * self.y + self.z * self.z
-    }
-
-    pub const fn dot(&self, rhs: &Vec3) -> f64 {
-        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
-    }
-
-    pub const fn cross(&self, rhs: &Vec3) -> Vec3 {
-        Vec3 {
-            x: self.y * rhs.z - self.z * rhs.y,
-            y: self.z * rhs.x - self.x * rhs.z,
-            z: self.x * rhs.y - self.y * rhs.x,
-        }
-    }
-
-    pub fn normalize(&self) -> Vec3 {
-        self / self.length()
-    }
-
-    pub fn clamp(&self, min: f64, max: f64) -> Vec3 {
-        Vec3 {
-            x: self.x.clamp(min, max),
-            y: self.y.clamp(min, max),
-            z: self.z.clamp(min, max),
+impl Distribution<Vec3> for StandardUniform {
+    fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vec3 {
+        loop {
+            let x: f64 = rng.random();
+            let y: f64 = rng.random();
+            let z: f64 = rng.random();
+            let vec3 = Vec3 { x, y, z };
+            if vec3.length() <= 1. {
+                return vec3; 
+            }
         }
     }
 }
