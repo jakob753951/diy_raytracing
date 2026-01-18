@@ -6,7 +6,6 @@ use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
 pub struct Camera {
-    aspect_ratio: f64,
     image_width: u16,
     image_height: u16,       // Rendered image height
     center: Point3,          // Camera center
@@ -45,7 +44,6 @@ impl Camera {
         let first_pixel_loc = viewport_top_left_pos + (pixel_delta_u + pixel_delta_v) * 0.5;
 
         Camera {
-            aspect_ratio,
             image_width,
             image_height,
             center: camera_center,
