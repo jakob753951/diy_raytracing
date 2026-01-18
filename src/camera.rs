@@ -4,16 +4,18 @@ use crate::hittable_collection::HittableCollection;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
+use rand;
 
 pub struct Camera {
     aspect_ratio: f64,
     image_width: u16,
-    image_height: u16, // Rendered image height
-    center: Point3, // Camera center
+    image_height: u16,       // Rendered image height
+    center: Point3,          // Camera center
     first_pixel_loc: Point3, // Location of pixel 0, 0
-    pixel_delta_u: Vec3, // Offset to pixel to the right
-    pixel_delta_v: Vec3, // Offset to pixel below
+    pixel_delta_u: Vec3,     // Offset to pixel to the right
+    pixel_delta_v: Vec3,     // Offset to pixel below
     samples_per_pixel: u8,
+    pixel_samples_scale: f64,
 }
 
 impl Camera {
@@ -52,6 +54,7 @@ impl Camera {
             pixel_delta_u,
             pixel_delta_v,
             samples_per_pixel,
+            pixel_samples_scale: 1. / (samples_per_pixel as f64),
         }
     }
 
@@ -64,17 +67,31 @@ impl Camera {
 
         for y in 0..image_height {
             for x in 0..image_width {
-                let pixel_center =
-                    self.first_pixel_loc + (self.pixel_delta_u * x as f64) + (self.pixel_delta_v * y as f64);
-                let ray_direction = pixel_center - self.center;
-                let ray = Ray {
-                    origin: self.center,
-                    direction: ray_direction,
-                };
+                let pixel_color: Vec3 = (0..self.samples_per_pixel)
+                    .map(|_| self.ray_from_pixel(x, y))
+                    .map(|ray| self.color_from_ray(ray, world))
+                    .sum();
 
-                let pixel_color = self.color_from_ray(ray, &world);
-                write_color(pixel_color);
+                write_color(pixel_color * self.pixel_samples_scale);
             }
+        }
+    }
+
+    fn ray_from_pixel(&self, x: u16, y: u16) -> Ray {
+        // Construct a camera ray originating from the origin and directed at randomly sampled
+        // point around the pixel location x, y.
+
+        let offset = sample_square();
+        let pixel_sample = self.first_pixel_loc
+            + ((x as f64 + offset.x) * self.pixel_delta_u)
+            + ((y as f64 + offset.y) * self.pixel_delta_v);
+
+        let ray_origin = self.center;
+        let ray_direction = pixel_sample - ray_origin;
+
+        Ray {
+            origin: ray_origin,
+            direction: ray_direction,
         }
     }
 
@@ -111,4 +128,14 @@ impl Camera {
 
 fn lerp(factor: f64, start: Vec3, end: Vec3) -> Vec3 {
     (1.0 - factor) * end + factor * start
+}
+
+
+/// Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
+fn sample_square() -> Vec3 {
+    Vec3 {
+        x: rand::random_range(-0.5..=0.5),
+        y: rand::random_range(-0.5..=0.5),
+        z: 0.,
+    }
 }
