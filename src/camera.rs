@@ -12,8 +12,7 @@ pub struct Camera {
     first_pixel_loc: Point3, // Location of pixel 0, 0
     pixel_delta_u: Vec3,     // Offset to pixel to the right
     pixel_delta_v: Vec3,     // Offset to pixel below
-    msaa_level: u8,
-    pixel_samples_scale: f64,
+    msaa_level: u8,          // Count of rows and columns of rays we should cast per pixel
 }
 
 impl Camera {
@@ -51,7 +50,6 @@ impl Camera {
             pixel_delta_u,
             pixel_delta_v,
             msaa_level,
-            pixel_samples_scale: 1. / (((msaa_level as u16) * (msaa_level as u16)) as f64),
         }
     }
 
@@ -62,6 +60,7 @@ impl Camera {
         println!("{image_width} {image_height}");
         println!("255");
 
+        let pixel_color_scale = 1. / ((self.msaa_level as f64) * (self.msaa_level as f64));
         for y in 0..image_height {
             for x in 0..image_width {
                 let pixel_color: Vec3 = self
@@ -70,7 +69,7 @@ impl Camera {
                     .map(|ray| self.color_from_ray(ray, world))
                     .sum();
 
-                write_color(pixel_color * self.pixel_samples_scale);
+                write_color(pixel_color * pixel_color_scale);
             }
         }
     }
