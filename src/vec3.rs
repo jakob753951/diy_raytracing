@@ -1,3 +1,4 @@
+use std::iter::Sum;
 use std::ops;
 use std::ops::{AddAssign, SubAssign};
 
@@ -33,6 +34,11 @@ impl AddAssign<Vec3> for Vec3 {
         self.x += rhs.x;
         self.y += rhs.y;
         self.z += rhs.z;
+    }
+}
+impl Sum for Vec3 {
+    fn sum<I: Iterator<Item=Self>>(iter: I) -> Self {
+        iter.fold(Vec3::zero(), |a, b| {a + b})
     }
 }
 
@@ -90,6 +96,58 @@ vec3_f64_mul!(Vec3, f64);
 vec3_f64_mul!(&Vec3, f64);
 vec3_f64_mul!(Vec3, &f64);
 vec3_f64_mul!(&Vec3, &f64);
+macro_rules! vec3_u16_mul {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Mul<$rhs> for $lhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x * (rhs as f64),
+                    y: self.y * (rhs as f64),
+                    z: self.z * (rhs as f64),
+                }
+            }
+        }
+        impl std::ops::Mul<$lhs> for $rhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $lhs) -> Vec3 {
+                Vec3 {
+                    x: (self as f64) * rhs.x,
+                    y: (self as f64) * rhs.y,
+                    z: (self as f64) * rhs.z,
+                }
+            }
+        }
+    };
+}
+macro_rules! vec3_u16_borrow_mul {
+    ( $lhs:ty , $rhs:ty ) => {
+        impl std::ops::Mul<$rhs> for $lhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $rhs) -> Vec3 {
+                Vec3 {
+                    x: self.x * (*rhs as f64),
+                    y: self.y * (*rhs as f64),
+                    z: self.z * (*rhs as f64),
+                }
+            }
+        }
+        impl std::ops::Mul<$lhs> for $rhs {
+            type Output = Vec3;
+            fn mul(self, rhs: $lhs) -> Vec3 {
+                Vec3 {
+                    x: (*self as f64) * rhs.x,
+                    y: (*self as f64) * rhs.y,
+                    z: (*self as f64) * rhs.z,
+                }
+            }
+        }
+    };
+}
+vec3_u16_mul!(Vec3, u16);
+vec3_u16_mul!(&Vec3, u16);
+vec3_u16_borrow_mul!(Vec3, &u16);
+vec3_u16_borrow_mul!(&Vec3, &u16);
 macro_rules! vec3_vec3_mul {
     ( $lhs:ty , $rhs:ty ) => {
         impl std::ops::Mul<$rhs> for $lhs {
