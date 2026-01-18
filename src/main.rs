@@ -35,7 +35,7 @@ fn main() {
                 z: -1.0,
             },
             radius: 100.,
-        })
+        }),
     ];
     let world = HittableCollection::from(objects);
 

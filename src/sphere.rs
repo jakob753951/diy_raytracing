@@ -20,7 +20,6 @@ impl Hittable for Sphere {
             return None;
         }
 
-
         let mut root = (h - discriminant.sqrt()) / a;
         if !t_interval.surrounds(root) {
             root = (h + discriminant.sqrt()) / a;
@@ -32,6 +31,6 @@ impl Hittable for Sphere {
         let t = root;
         let p = ray.at(t);
         let normal = (p - self.center) / self.radius;
-        Some(Hit { p, normal, t, })
+        Some(Hit { p, normal, t })
     }
 }

@@ -1,4 +1,4 @@
-use crate::color::{write_color, Color};
+use crate::color::{Color, write_color};
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
 use crate::interval::Interval;
@@ -64,7 +64,8 @@ impl Camera {
 
         for y in 0..image_height {
             for x in 0..image_width {
-                let pixel_color: Vec3 = self.rays_from_pixel(x, y, self.msaa_level)
+                let pixel_color: Vec3 = self
+                    .rays_from_pixel(x, y, self.msaa_level)
                     .iter()
                     .map(|ray| self.color_from_ray(ray, world))
                     .sum();
@@ -79,9 +80,9 @@ impl Camera {
         for y in 1..=msaa_level {
             for x in 1..=msaa_level {
                 let x = x as f64;
-                let y = y as f64; 
+                let y = y as f64;
                 let n = msaa_level as f64;
-                points.push((x/n - 1./2.*n, y/n - 1./2.*n));
+                points.push((x / n - 1. / 2. * n, y / n - 1. / 2. * n));
             }
         }
         points
