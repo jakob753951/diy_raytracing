@@ -6,7 +6,7 @@ use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
 
 pub struct Camera {
-    image_width: u16,
+    image_width: u16,        // Rendered image height
     image_height: u16,       // Rendered image height
     center: Point3,          // Camera center
     first_pixel_loc: Point3, // Location of pixel 0, 0
