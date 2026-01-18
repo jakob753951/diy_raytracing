@@ -14,12 +14,12 @@ pub struct Camera {
     first_pixel_loc: Point3, // Location of pixel 0, 0
     pixel_delta_u: Vec3,     // Offset to pixel to the right
     pixel_delta_v: Vec3,     // Offset to pixel below
-    samples_per_pixel: u8,
+    msaa_level: u8,
     pixel_samples_scale: f64,
 }
 
 impl Camera {
-    pub fn new(image_width: u16, aspect_ratio: f64, samples_per_pixel: u8) -> Camera {
+    pub fn new(image_width: u16, aspect_ratio: f64, msaa_level: u8) -> Camera {
         // image dimensions
         let image_height = ((image_width as f64) / aspect_ratio) as u16;
         let image_height = image_height.max(1);
@@ -53,8 +53,8 @@ impl Camera {
             first_pixel_loc,
             pixel_delta_u,
             pixel_delta_v,
-            samples_per_pixel,
-            pixel_samples_scale: 1. / (samples_per_pixel as f64),
+            msaa_level,
+            pixel_samples_scale: 1. / (((msaa_level as u16) * (msaa_level as u16)) as f64),
         }
     }
 
@@ -67,8 +67,8 @@ impl Camera {
 
         for y in 0..image_height {
             for x in 0..image_width {
-                let pixel_color: Vec3 = (0..self.samples_per_pixel)
-                    .map(|_| self.ray_from_pixel(x, y))
+                let pixel_color: Vec3 = self.rays_from_pixel(x, y, self.msaa_level)
+                    .iter()
                     .map(|ray| self.color_from_ray(ray, world))
                     .sum();
 
@@ -77,25 +77,34 @@ impl Camera {
         }
     }
 
-    fn ray_from_pixel(&self, x: u16, y: u16) -> Ray {
-        // Construct a camera ray originating from the origin and directed at randomly sampled
-        // point around the pixel location x, y.
-
-        let offset = sample_square();
-        let pixel_sample = self.first_pixel_loc
-            + ((x as f64 + offset.x) * self.pixel_delta_u)
-            + ((y as f64 + offset.y) * self.pixel_delta_v);
-
-        let ray_origin = self.center;
-        let ray_direction = pixel_sample - ray_origin;
-
-        Ray {
-            origin: ray_origin,
-            direction: ray_direction,
+    fn rays_from_pixel(&self, x: u16, y: u16, msaa_level: u8) -> Vec<Ray> {
+        let mut points: Vec<(f64, f64)> = Vec::new();
+        for y in 1..=msaa_level {
+            for x in 1..=msaa_level {
+                let x = x as f64;
+                let y = y as f64; 
+                let n = msaa_level as f64;
+                points.push((x/n - 1./2.*n, y/n - 1./2.*n));
+            }
         }
+        points
+            .iter()
+            .map(|(x_offset, y_offset)| {
+                let pixel_sample = self.first_pixel_loc
+                    + ((x as f64 + x_offset) * self.pixel_delta_u)
+                    + ((y as f64 + y_offset) * self.pixel_delta_v);
+
+                let ray_origin = self.center;
+                let ray_direction = pixel_sample - ray_origin;
+                Ray {
+                    origin: ray_origin,
+                    direction: ray_direction,
+                }
+            })
+            .collect()
     }
 
-    fn color_from_ray(&self, ray: Ray, world: &HittableCollection) -> Color {
+    fn color_from_ray(&self, ray: &Ray, world: &HittableCollection) -> Color {
         let hit = world.hit(
             &ray,
             Interval {
@@ -129,7 +138,6 @@ impl Camera {
 fn lerp(factor: f64, start: Vec3, end: Vec3) -> Vec3 {
     (1.0 - factor) * end + factor * start
 }
-
 
 /// Returns the vector to a random point in the [-.5,-.5]-[+.5,+.5] unit square.
 fn sample_square() -> Vec3 {
