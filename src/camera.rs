@@ -81,7 +81,7 @@ impl Camera {
                 let x = x as f64;
                 let y = y as f64;
                 let n = msaa_level as f64;
-                points.push((x / n - 1. / 2. * n, y / n - 1. / 2. * n));
+                points.push((x / n - 1. / (2. * n), y / n - 1. / (2. * n)));
             }
         }
         points
