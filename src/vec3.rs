@@ -288,9 +288,9 @@ impl ops::Neg for &Vec3 {
 impl Distribution<Vec3> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vec3 {
         loop {
-            let x: f64 = rng.random();
-            let y: f64 = rng.random();
-            let z: f64 = rng.random();
+            let x: f64 = rng.random_range(0.0..=1.0);
+            let y: f64 = rng.random_range(0.0..=1.0);
+            let z: f64 = rng.random_range(0.0..=1.0);
             let vec3 = Vec3 { x, y, z };
             if vec3.length() <= 1. {
                 return vec3;
