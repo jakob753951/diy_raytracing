@@ -16,7 +16,7 @@ fn main() {
     let aspect_ratio = 16. / 9.;
     let image_width = 1000;
 
-    let camera = Camera::new(image_width, aspect_ratio, 4);
+    let camera = Camera::new(image_width, aspect_ratio, 4, 50);
 
     // world
     let objects: Vec<Box<dyn Hittable>> = vec![

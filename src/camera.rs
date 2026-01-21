@@ -16,10 +16,11 @@ pub struct Camera {
     pixel_delta_u: Vec3,     // Offset to pixel to the right
     pixel_delta_v: Vec3,     // Offset to pixel below
     msaa_level: u8,          // Count of rows and columns of rays we should cast per pixel
+    max_light_bounces: u8,           // Maximum number of ray bounces
 }
 
 impl Camera {
-    pub fn new(image_width: u16, aspect_ratio: f64, msaa_level: u8) -> Camera {
+    pub fn new(image_width: u16, aspect_ratio: f64, msaa_level: u8, max_light_bounces: u8) -> Camera {
         // image dimensions
         let image_height = ((image_width as f64) / aspect_ratio) as u16;
         let image_height = image_height.max(1);
@@ -53,6 +54,7 @@ impl Camera {
             pixel_delta_u,
             pixel_delta_v,
             msaa_level,
+            max_light_bounces,
         }
     }
 
@@ -69,7 +71,7 @@ impl Camera {
                 let pixel_color: Vec3 = self
                     .rays_from_pixel(x, y, self.msaa_level)
                     .iter()
-                    .map(|ray| self.color_from_ray(ray, world))
+                    .map(|ray| self.color_from_ray(ray, world, self.max_light_bounces))
                     .sum();
 
                 write_color(pixel_color * pixel_color_scale);
@@ -104,7 +106,10 @@ impl Camera {
             .collect()
     }
 
-    fn color_from_ray(&self, ray: &Ray, world: &HittableCollection) -> Color {
+    fn color_from_ray(&self, ray: &Ray, world: &HittableCollection, remaining_bounces: u8) -> Color {
+        if remaining_bounces <= 0 {
+            return Color::black();
+        }
         let hit = world.hit(
             &ray,
             Interval {
@@ -121,7 +126,7 @@ impl Camera {
                 } else {
                     bounce_direction
                 };
-                0.5 * self.color_from_ray(&Ray{origin:hit.p, direction:bounce_direction}, world)
+                0.5 * self.color_from_ray(&Ray{origin:hit.p, direction:bounce_direction}, world, remaining_bounces-1)
             }
             None => {
                 let unit_direction = ray.direction.normalize();
