@@ -292,7 +292,7 @@ impl Distribution<Vec3> for StandardUniform {
             let y: f64 = rng.random_range(0.0..=1.0);
             let z: f64 = rng.random_range(0.0..=1.0);
             let vec3 = Vec3 { x, y, z };
-            if vec3.length() <= 1. {
+            if vec3.length_squared() <= 1. {
                 return vec3.normalize();
             }
         }
