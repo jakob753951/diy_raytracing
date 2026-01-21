@@ -1,3 +1,6 @@
+use rand::{random, Rng};
+use rand::distr::StandardUniform;
+use rand::rngs::StdRng;
 use crate::color::{Color, write_color};
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
@@ -111,9 +114,14 @@ impl Camera {
         );
         match hit {
             Some(hit) => {
-                let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
-
-                0.5 * (hit.normal + Color::white())
+                // let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
+                let bounce_direction: Vec3 = rand::rng().sample(StandardUniform);
+                let bounce_direction = if Vec3::dot(&bounce_direction, &hit.normal) < 0. {
+                    -bounce_direction
+                } else {
+                    bounce_direction
+                };
+                0.5 * self.color_from_ray(&Ray{origin:hit.p, direction:bounce_direction}, world)
             }
             None => {
                 let unit_direction = ray.direction.normalize();
