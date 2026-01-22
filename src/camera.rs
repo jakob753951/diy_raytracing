@@ -119,13 +119,14 @@ impl Camera {
         );
         match hit {
             Some(hit) => {
-                // let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
-                let bounce_direction: Vec3 = rand::rng().sample(StandardUniform);
-                let bounce_direction = if Vec3::dot(&bounce_direction, &hit.normal) < 0. {
-                    -bounce_direction
+                let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
+                let camera_side_normal = if front_face {
+                    hit.normal
                 } else {
-                    bounce_direction
+                    -hit.normal
                 };
+                let random_unit_vector: Vec3 = rand::rng().sample(StandardUniform);
+                let bounce_direction = camera_side_normal + random_unit_vector;
                 0.5 * self.color_from_ray(&Ray{origin:hit.p, direction:bounce_direction}, world, remaining_bounces-1)
             }
             None => {
