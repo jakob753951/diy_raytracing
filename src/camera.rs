@@ -1,12 +1,11 @@
-use rand::{random, Rng};
-use rand::distr::StandardUniform;
-use rand::rngs::StdRng;
-use crate::color::{Color, write_color};
+use crate::color::{write_color, Color};
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
+use rand::distr::StandardUniform;
+use rand::Rng;
 
 pub struct Camera {
     image_width: u16,        // Rendered image height
