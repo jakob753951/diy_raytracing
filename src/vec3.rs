@@ -51,10 +51,17 @@ impl Vec3 {
     }
 
     pub fn clamp(&self, min: f64, max: f64) -> Vec3 {
+        self.map(|n| n.clamp(min, max))
+    }
+
+    pub fn map<F>(&self, function: F) -> Vec3
+    where
+        F: Fn(f64) -> f64,
+    {
         Vec3 {
-            x: self.x.clamp(min, max),
-            y: self.y.clamp(min, max),
-            z: self.z.clamp(min, max),
+            x: function(self.x),
+            y: function(self.y),
+            z: function(self.z),
         }
     }
 }
@@ -121,21 +128,13 @@ macro_rules! vec3_f64_mul {
         impl std::ops::Mul<$rhs> for $lhs {
             type Output = Vec3;
             fn mul(self, rhs: $rhs) -> Vec3 {
-                Vec3 {
-                    x: self.x * rhs,
-                    y: self.y * rhs,
-                    z: self.z * rhs,
-                }
+                self.map(|n| n * rhs)
             }
         }
         impl std::ops::Mul<$lhs> for $rhs {
             type Output = Vec3;
             fn mul(self, rhs: $lhs) -> Vec3 {
-                Vec3 {
-                    x: self * rhs.x,
-                    y: self * rhs.y,
-                    z: self * rhs.z,
-                }
+                rhs.map(|n| n * self)
             }
         }
     };
@@ -149,21 +148,13 @@ macro_rules! vec3_u16_mul {
         impl std::ops::Mul<$rhs> for $lhs {
             type Output = Vec3;
             fn mul(self, rhs: $rhs) -> Vec3 {
-                Vec3 {
-                    x: self.x * (rhs as f64),
-                    y: self.y * (rhs as f64),
-                    z: self.z * (rhs as f64),
-                }
+                self.map(|n| n * rhs as f64)
             }
         }
         impl std::ops::Mul<$lhs> for $rhs {
             type Output = Vec3;
             fn mul(self, rhs: $lhs) -> Vec3 {
-                Vec3 {
-                    x: (self as f64) * rhs.x,
-                    y: (self as f64) * rhs.y,
-                    z: (self as f64) * rhs.z,
-                }
+                rhs.map(|n| n * self as f64)
             }
         }
     };
@@ -173,21 +164,13 @@ macro_rules! vec3_u16_borrow_mul {
         impl std::ops::Mul<$rhs> for $lhs {
             type Output = Vec3;
             fn mul(self, rhs: $rhs) -> Vec3 {
-                Vec3 {
-                    x: self.x * (*rhs as f64),
-                    y: self.y * (*rhs as f64),
-                    z: self.z * (*rhs as f64),
-                }
+                self.map(|n| n * *rhs as f64)
             }
         }
         impl std::ops::Mul<$lhs> for $rhs {
             type Output = Vec3;
             fn mul(self, rhs: $lhs) -> Vec3 {
-                Vec3 {
-                    x: (*self as f64) * rhs.x,
-                    y: (*self as f64) * rhs.y,
-                    z: (*self as f64) * rhs.z,
-                }
+                rhs.map(|n| n * *self as f64)
             }
         }
     };
@@ -234,11 +217,7 @@ macro_rules! vec3_f64_div {
         impl std::ops::Div<$rhs> for $lhs {
             type Output = Vec3;
             fn div(self, rhs: $rhs) -> Vec3 {
-                Vec3 {
-                    x: self.x / rhs,
-                    y: self.y / rhs,
-                    z: self.z / rhs,
-                }
+                self.map(|n| n / rhs)
             }
         }
     };
@@ -277,28 +256,21 @@ impl ops::Neg for &Vec3 {
     type Output = Vec3;
 
     fn neg(self) -> Self::Output {
-        Vec3 {
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
-        }
+        self.map(f64::neg)
     }
 }
 impl ops::Neg for Vec3 {
     type Output = Vec3;
 
     fn neg(self) -> Self::Output {
-        Vec3 {
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
-        }
+        self.map(f64::neg)
     }
 }
 
 impl Distribution<Vec3> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vec3 {
         loop {
+            
             let x: f64 = rng.random_range(0.0..=1.0);
             let y: f64 = rng.random_range(0.0..=1.0);
             let z: f64 = rng.random_range(0.0..=1.0);
