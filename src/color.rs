@@ -34,14 +34,29 @@ impl Color {
     pub fn black() -> Color {
         Vec3::zero()
     }
+    
+    pub fn gamma_correct(&self) -> Color {
+        self.map(linear_to_gamma)
+    }
 }
 
 pub fn write_color(color: Color) {
-    let color = color.clamp(0., 0.999);
+    
+    let color = color
+        .gamma_correct()
+        .clamp(0., 0.999);
 
     let color = color * 256.;
 
     let Color { x: r, y: g, z: b } = color;
     let (r, g, b) = (r as u8, g as u8, b as u8);
     println!("{r} {g} {b}")
+}
+
+pub fn linear_to_gamma(linear_component: f64) -> f64 {
+    if linear_component >= 0. {
+        linear_component.sqrt()
+    } else {
+        0.
+    }
 }
