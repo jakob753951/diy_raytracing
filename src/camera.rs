@@ -126,7 +126,7 @@ impl Camera {
                 };
                 let random_unit_vector: Vec3 = rand::rng().sample(StandardUniform);
                 let bounce_direction = camera_side_normal + random_unit_vector;
-                0.5 * self.color_from_ray(&Ray{origin:hit.p, direction:bounce_direction}, world, remaining_bounces-1)
+                0.5 * self.color_from_ray(&Ray{origin:hit.location, direction:bounce_direction}, world, remaining_bounces-1)
             }
             None => {
                 let unit_direction = ray.direction.normalize();

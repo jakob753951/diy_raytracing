@@ -4,7 +4,7 @@ use crate::vec3::{Point3, Vec3};
 
 #[derive(Copy, Clone)]
 pub struct Hit {
-    pub p: Point3,
+    pub location: Point3,
     pub normal: Vec3,
     pub t: f64,
 }

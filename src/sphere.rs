@@ -29,8 +29,8 @@ impl Hittable for Sphere {
         }
 
         let t = root;
-        let p = ray.at(t);
-        let normal = (p - self.center) / self.radius;
-        Some(Hit { p, normal, t })
+        let location = ray.at(t);
+        let normal = (location - self.center) / self.radius;
+        Some(Hit { location, normal, t })
     }
 }
