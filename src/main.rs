@@ -1,4 +1,6 @@
+use std::sync::Arc;
 use crate::camera::Camera;
+use crate::color::Color;
 use crate::hittable::Hittable;
 use crate::hittable_collection::HittableCollection;
 use crate::sphere::Sphere;
@@ -11,6 +13,9 @@ mod interval;
 mod ray;
 mod sphere;
 mod vec3;
+mod material;
+mod materials;
+use crate::materials::lambertian::Lambertian;
 
 fn main() {
     let aspect_ratio = 16. / 9.;
@@ -27,6 +32,7 @@ fn main() {
                 z: -1.0,
             },
             radius: 0.5,
+            material: Arc::new(Lambertian { albedo: Color::white() }),
         }),
         Box::new(Sphere {
             center: Vec3 {
@@ -35,6 +41,7 @@ fn main() {
                 z: -1.0,
             },
             radius: 100.,
+            material: Arc::new(Lambertian { albedo: Color::white() }),
         }),
     ];
     let world = HittableCollection::from(objects);
