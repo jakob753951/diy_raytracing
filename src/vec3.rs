@@ -64,6 +64,10 @@ impl Vec3 {
             z: function(self.z),
         }
     }
+
+    pub fn reflect(&self, surface_normal: Vec3) -> Vec3 {
+        self - 2. * Vec3::dot(self, &surface_normal) * self
+    }
 }
 
 macro_rules! vec3_vec3_add {
@@ -270,7 +274,6 @@ impl ops::Neg for Vec3 {
 impl Distribution<Vec3> for StandardUniform {
     fn sample<R: Rng + ?Sized>(&self, rng: &mut R) -> Vec3 {
         loop {
-            
             let x: f64 = rng.random_range(0.0..=1.0);
             let y: f64 = rng.random_range(0.0..=1.0);
             let z: f64 = rng.random_range(0.0..=1.0);
