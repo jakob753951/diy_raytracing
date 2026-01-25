@@ -4,8 +4,6 @@ use crate::hittable_collection::HittableCollection;
 use crate::interval::Interval;
 use crate::ray::Ray;
 use crate::vec3::{Point3, Vec3};
-use rand::distr::StandardUniform;
-use rand::Rng;
 
 pub struct Camera {
     image_width: u16,        // Rendered image height
@@ -118,15 +116,11 @@ impl Camera {
         );
         match hit {
             Some(hit) => {
-                let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
-                let camera_side_normal = if front_face {
-                    hit.normal
-                } else {
-                    -hit.normal
-                };
-                let random_unit_vector: Vec3 = rand::rng().sample(StandardUniform);
-                let bounce_direction = camera_side_normal + random_unit_vector;
-                0.5 * self.color_from_ray(&Ray{origin:hit.location, direction:bounce_direction}, world, remaining_bounces-1)
+                match hit.material.scatter(&ray, &hit) {
+                    None => Color::black(),
+                    Some(scattering) =>
+                        scattering.attenuation * self.color_from_ray(&scattering.scattered, world, remaining_bounces-1),
+                }
             }
             None => {
                 let unit_direction = ray.direction.normalize();

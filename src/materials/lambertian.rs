@@ -11,8 +11,20 @@ pub struct Lambertian {
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, hit: Hit) -> Option<Scattering> {
-        let scatter_direction = hit.normal + rng().sample::<Vec3, _>(StandardUniform);
+    fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<Scattering> {
+        let front_face = Vec3::dot(&hit.normal, &ray.direction) < 0.;
+        let camera_side_normal = if front_face {
+            hit.normal
+        } else {
+            -hit.normal
+        };
+
+        let mut scatter_direction = camera_side_normal + rng().sample::<Vec3, _>(StandardUniform);
+
+        if scatter_direction.length() < 1e-8 {
+            scatter_direction = camera_side_normal;
+        }
+
         Some(Scattering {
             scattered: Ray {
                 origin: hit.location,

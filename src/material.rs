@@ -3,7 +3,7 @@ use crate::hittable::Hit;
 use crate::ray::Ray;
 
 pub trait Material {
-    fn scatter(&self, hit: Hit) -> Option<Scattering>;
+    fn scatter(&self, ray: &Ray, hit: &Hit) -> Option<Scattering>;
 }
 
 pub struct Scattering {

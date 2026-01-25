@@ -32,7 +32,7 @@ fn main() {
                 z: -1.0,
             },
             radius: 0.5,
-            material: Arc::new(Lambertian { albedo: Color::white() }),
+            material: Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) }),
         }),
         Box::new(Sphere {
             center: Vec3 {
@@ -41,7 +41,7 @@ fn main() {
                 z: -1.0,
             },
             radius: 100.,
-            material: Arc::new(Lambertian { albedo: Color::white() }),
+            material: Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) }),
         }),
     ];
     let world = HittableCollection::from(objects);
