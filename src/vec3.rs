@@ -7,6 +7,8 @@ use std::ops::{AddAssign, SubAssign};
 pub type Point3 = Vec3;
 
 #[derive(Copy, Clone)]
+#[derive(Debug)]
+#[derive(PartialEq)]
 pub struct Vec3 {
     pub x: f64,
     pub y: f64,
@@ -66,7 +68,7 @@ impl Vec3 {
     }
 
     pub fn reflect(&self, surface_normal: Vec3) -> Vec3 {
-        self - 2. * Vec3::dot(self, &surface_normal) * self
+        self - 2. * Vec3::dot(self, &surface_normal) * surface_normal
     }
 }
 
@@ -282,5 +284,21 @@ impl Distribution<Vec3> for StandardUniform {
                 return vec3.normalize();
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::vec3::Vec3;
+
+    #[test]
+    fn reflect_basic() {
+        let a = Vec3::new(1., -1., 3.);
+        let b = Vec3::new(0.0, 1.0, 0.0);
+        assert_eq!(Vec3::dot(&a, &b), -1.);
+
+        let reflected = a.reflect(b);
+        let expected = Vec3::new(1.0, 1.0, 3.0);
+        assert_eq!(reflected, expected);
     }
 }

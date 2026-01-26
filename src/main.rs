@@ -16,6 +16,7 @@ mod vec3;
 mod material;
 mod materials;
 use crate::materials::lambertian::Lambertian;
+use crate::materials::metal::Metal;
 
 fn main() {
     let aspect_ratio = 16. / 9.;
@@ -26,22 +27,24 @@ fn main() {
     // world
     let objects: Vec<Box<dyn Hittable>> = vec![
         Box::new(Sphere {
-            center: Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: -1.0,
-            },
+            center: Vec3::new(0.0, -100.5, -1.0),
+            radius: 100.,
+            material: Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) }),
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(0.0, 0.0, -1.0),
             radius: 0.5,
             material: Arc::new(Lambertian { albedo: Color::new(0.1, 0.2, 0.5) }),
         }),
         Box::new(Sphere {
-            center: Vec3 {
-                x: 0.0,
-                y: -100.5,
-                z: -1.0,
-            },
-            radius: 100.,
-            material: Arc::new(Lambertian { albedo: Color::new(0.8, 0.8, 0.0) }),
+            center: Vec3::new(-1.0, 0.0, -1.0),
+            radius: 0.5,
+            material: Arc::new(Metal { albedo: Color::new(0.8, 0.8, 0.8) }),
+        }),
+        Box::new(Sphere {
+            center: Vec3::new(1.0, 0.0, -1.0),
+            radius: 0.5,
+            material: Arc::new(Metal { albedo: Color::new(0.8, 0.8, 0.0) }),
         }),
     ];
     let world = HittableCollection::from(objects);
