@@ -39,12 +39,12 @@ fn main() {
         Box::new(Sphere {
             center: Vec3::new(-1.0, 0.0, -1.0),
             radius: 0.5,
-            material: Arc::new(Metal { albedo: Color::new(0.8, 0.8, 0.8) }),
+            material: Arc::new(Metal { albedo: Color::new(0.8, 0.8, 0.8), fuzz: 0.3 }),
         }),
         Box::new(Sphere {
             center: Vec3::new(1.0, 0.0, -1.0),
             radius: 0.5,
-            material: Arc::new(Metal { albedo: Color::new(0.8, 0.8, 0.0) }),
+            material: Arc::new(Metal { albedo: Color::new(0.8, 0.8, 0.0), fuzz: 1.0 }),
         }),
     ];
     let world = HittableCollection::from(objects);
